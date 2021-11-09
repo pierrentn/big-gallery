@@ -19,11 +19,13 @@ class Gallery {
 
     this.rootScaleInterval = 0.2;
 
-    //Init
-    this.mousePosition = 0.2;
-    this.scaleRatioCalculation();
-    this.scaleImages();
+    this.speed = 0.02;
 
+    //Init
+    this.mousePosition = 0.02;
+    this.mouseMaxPos = 0.02;
+
+    this.loop();
     document.addEventListener("mousemove", this.handleMouseMove.bind(this));
   }
 
@@ -35,9 +37,13 @@ class Gallery {
 
   handleMouseMove(e) {
     this.mousePosition = e.clientX / window.innerWidth;
+  }
 
+  loop() {
     this.scaleRatioCalculation();
     this.scaleImages();
+
+    requestAnimationFrame(this.loop.bind(this));
   }
 
   scaleRatioCalculation() {
@@ -46,9 +52,12 @@ class Gallery {
       scaleOffsetArray = [0],
       scaleSum = 0;
 
+    let mouseDist = this.mousePosition - this.mouseMaxPos;
+    this.mouseMaxPos = this.mouseMaxPos + mouseDist * this.speed;
+    const h = this.mouseMaxPos;
+
     //We calculate the scale using the scaling function foreach image
     for (let i = 0; i < this.images.length; i++) {
-      const h = this.mousePosition;
       const x = (1 / (this.images.length - 1)) * i;
       let scale = 1 * scaling(x, h);
       scaleArray.push(scale);
