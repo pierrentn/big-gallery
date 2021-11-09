@@ -19,6 +19,11 @@ class Gallery {
 
     this.rootScaleInterval = 0.2;
 
+    //Init
+    this.mousePosition = 0.2;
+    this.scaleRatioCalculation();
+    this.scaleImages();
+
     document.addEventListener("mousemove", this.handleMouseMove.bind(this));
   }
 
@@ -32,7 +37,7 @@ class Gallery {
     this.mousePosition = e.clientX / window.innerWidth;
 
     this.scaleRatioCalculation();
-    this.scaleImages(e);
+    this.scaleImages();
   }
 
   scaleRatioCalculation() {
