@@ -1,4 +1,10 @@
-function scaling(x, h = 1) {
+/**
+ *
+ * @param {number} x - Position of the image [0,1]
+ * @param {number} h - X position of the mouse [0,1]
+ * @returns
+ */
+function scaling(x, h) {
   const a = -0.7;
   const k = 1;
   return a * Math.pow(x - h, 2) + k;
@@ -6,24 +12,25 @@ function scaling(x, h = 1) {
 
 class Gallery {
   constructor(el) {
+    //Images container
     this.root = el;
+    //Images
     this.images = Array.from(el.children);
+    //Image size calculated depending viewport width
     this.imageSize = window.innerWidth / this.images.length;
     this.setImageSize();
 
-    //In %
-    this.spaceBetweenImages = 20;
-
-    this.baseScaling = 0.5;
-    this.scalingValue = 0.75;
+    //Space in percentage between images
+    this.spaceBetweenImages = 5;
 
     this.rootScaleInterval = 0.2;
 
     this.speed = 0.02;
 
-    //Init
+    //X position of the mouse [0,1]
     this.mousePosition = 0.02;
-    this.mouseMaxPos = 0.02;
+    //Position of the mouse delayed depending the speed value [0,1]
+    this.mouseDelayedPos = 0.02;
 
     this.loop();
     document.addEventListener("mousemove", this.handleMouseMove.bind(this));
@@ -47,16 +54,21 @@ class Gallery {
   }
 
   scaleRatioCalculation() {
-    let scaleArray = [],
+    let // Scale outputted by scale function
+      scaleArray = [],
+      scaleSum = 0,
+      // Scale calculated from scaleArray adjusted to fit screen
       scaleRatioArray = [],
-      scaleOffsetArray = [0],
-      scaleSum = 0;
+      //scaleRatioArray values converted to percentage used to translate images
+      scaleOffsetArray = [0];
 
-    let mouseDist = this.mousePosition - this.mouseMaxPos;
-    this.mouseMaxPos = this.mouseMaxPos + mouseDist * this.speed;
-    const h = this.mouseMaxPos;
+    // Distance between the mouse and and delayed mouse
+    let mouseDelta = this.mousePosition - this.mouseDelayedPos;
 
-    //We calculate the scale using the scaling function foreach image
+    this.mouseDelayedPos = this.mouseDelayedPos + mouseDelta * this.speed;
+    const h = this.mouseDelayedPos;
+
+    //We calculate the scale using the scaling function foreach images
     for (let i = 0; i < this.images.length; i++) {
       const x = (1 / (this.images.length - 1)) * i;
       let scale = 1 * scaling(x, h);
@@ -82,13 +94,11 @@ class Gallery {
       const scale =
         j == 0
           ? this.scaleRatioArray[j]
-          : this.scaleRatioArray[j] -
-            this.spaceBetweenImages / 100 / this.images.length;
+          : this.scaleRatioArray[j] - this.spaceBetweenImages / 100;
       const offset =
         j == 0
           ? this.scaleOffsetArray[j]
-          : this.scaleOffsetArray[j] -
-            this.spaceBetweenImages / this.images.length;
+          : this.scaleOffsetArray[j] - this.spaceBetweenImages;
 
       image.style.setProperty(
         "transform",
